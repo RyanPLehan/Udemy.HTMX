@@ -4,6 +4,7 @@ import { HTMX_KNOWLEDGE } from './data/htmx-info.js';
 
 const app = express();
 
+app.use(express.urlencoded({extended: false}));
 app.use(express.static('public'));
 
 app.get('/', (req, res) => {
@@ -18,7 +19,7 @@ app.get('/', (req, res) => {
           
         />
         <link rel="icon" href="/icon.png" />
-        <script src="https://unpkg.com/htmx.org@2.0.4" delay></script>
+        <script src="/htmx.min.js" defer></script>
         <link rel="stylesheet" href="/main.css" />
       </head>
       <body>
@@ -29,23 +30,37 @@ app.get('/', (req, res) => {
 
         <main>
           <p>HTMX is a JavaScript library that you use without writing JavaScript code.</p>
-          <button 
-            hx-get="/info"
-            hx-trigger="mouseenter[ctrlKey], click" 
-            hx-target="main" 
-            hx-swap="beforeend">
-            Learn More
-          </button>
+          <form hx-post="/note" 
+                hx-target="ul" 
+                hx-swap="outerHTML">
+            <p>
+              <label for="note">Your note</label>
+              <input type="text" id="note" name="note"> 
+              <!-- name attribute should be set for hx-post to work automatically -->
+            </p>
+            <p>
+              <button>Save Note</button>
+            </p>
+          </form>
+          <ul>
+            ${HTMX_KNOWLEDGE.map((info) => `<li>${info}</li>`).join('')}
+          </ul>
         </main>
       </body>
     </html>
   `);
 });
 
-app.get('/info', (req, res) => {
+app.post('/note', (req, res) => {
+    const formData = req.body;
+    const enteredNote = formData.note;  // or req.body.note
+    HTMX_KNOWLEDGE.unshift(enteredNote);
+    // res.redirect('/');  This will cause an issue without a hx-swap and hx-target
+
+    // Here we are just sending back the list and only update a specific area
     res.send(`
         <ul>
-            ${HTMX_KNOWLEDGE.map(info => `<li>${info}</li>`).join('')}
+        ${HTMX_KNOWLEDGE.map((info) => `<li>${info}</li>`).join('')}
         </ul>
     `);
 });
