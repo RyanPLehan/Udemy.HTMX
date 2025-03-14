@@ -24,8 +24,8 @@ app.get('/', (req, res) => {
         <section>
           <form id="goal-form" 
                 hx-post="/goals"
-                hx-target="ul"
-                hw-swap="outerHTML">
+                hx-target="#goals"
+                hw-swap="beforeend">
             <div>
               <label htmlFor="goal">Goal</label>
               <input type="text" id="goal" name="goal" />
@@ -56,17 +56,12 @@ app.post('/goals', (req, res) => {
     const goalText = req.body.goal;
     courseGoals.push(goalText);
 
-    res.send(`
-        <ul id="goals">
-        ${courseGoals.map(
-        (goal, index) => `
-        <li id="goal-${index}">
-            <span>${goal}</span>
+    // since we pushed a new item on the array, then the index is the last item
+    res.send(`       
+        <li id="goal-${courseGoals.length - 1}">
+            <span>${goalText}</span>
             <button>Remove</button>
         </li>
-        `
-        )}
-        </ul>
     `);
 });
 
