@@ -35,15 +35,14 @@ app.get('/', (req, res) => {
           </form>
         </section>
         <section>
-          <ul id="goals">
+          <ul id="goals" hx-swap="outerHTML">
           ${courseGoals.map(
             (goal) => `
             <li id="goal-${goal.id}">
               <span>${goal.text}</span>
               <button 
                 hx-delete="/goals/${goal.id}"
-                hx-target="#goal-${goal.id}"
-                hx-swap="outerHTML"
+                hx-target="#goal-${goal.id}"                
                 >
                 Remove
                 </button>
@@ -71,7 +70,6 @@ app.post('/goals', (req, res) => {
       <button 
         hx-delete="/goals/${uuid}"
         hx-target="#goal-${uuid}"
-        hx-swap="outerHTML"
       >
       Remove
       </button>
