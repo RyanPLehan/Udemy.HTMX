@@ -10,14 +10,13 @@ function renderGoalListItem(id, text)
             <span>${text}</span>
             <button 
             hx-delete="/goals/${id}"
-            hx-target="#goal-${id}"                
+            hx-target="#goal-${id}"
             >
             Remove
             </button>
         </li>
     `
 }
-
 
 
 const app = express();
@@ -53,7 +52,9 @@ app.get('/', (req, res) => {
           </form>
         </section>
         <section>
-          <ul id="goals" hx-swap="outerHTML">
+          <ul id="goals" 
+              hx-swap="outerHTML"
+              hx-confirm="Are you sure?">
           ${courseGoals.map(
             (goal) => renderGoalListItem(goal.id, goal.text)
           ).join('')}
