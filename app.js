@@ -22,10 +22,11 @@ app.get('/', (req, res) => {
       <main>
         <h1>Manage your course goals</h1>
         <section>
-          <form id="goal-form" 
-                hx-post="/goals"
-                hx-target="#goals"
-                hw-swap="beforebegin">
+          <form 
+            id="goal-form" 
+            hx-post="/goals" 
+            hx-target="#goals"
+            hx-swap="beforeend">
             <div>
               <label htmlFor="goal">Goal</label>
               <input type="text" id="goal" name="goal" />
@@ -34,7 +35,22 @@ app.get('/', (req, res) => {
           </form>
         </section>
         <section>
-          <ul id="goals"></ul>
+          <ul id="goals">
+          ${courseGoals.map(
+            (goal, index) => `
+            <li id="goal-${index}">
+              <span>${goal}</span>
+              <button 
+                hx-delete="/goals/${index}"
+                hx-target="#goal-${index}"
+                hx-swap="outerHTML"
+                >
+                Remove
+                </button>
+            </li>
+          `
+          ).join('')}
+          </ul>
         </section>
       </main>
     </body>
@@ -43,35 +59,29 @@ app.get('/', (req, res) => {
 });
 
 app.post('/goals', (req, res) => {
-    const formData = req.body;
-    const goalText = req.body.goal;
-    courseGoals.push(goalText);
+  const goalText = req.body.goal;
+  courseGoals.push(goalText);
+  // res.redirect('/');
 
-    // Since we pushed a new item on the array, then the index is the last item (need to use hx-swap="beforeend")
-    //res.send(`<li id="goal-${courseGoals.length - 1}">${goalText}</li>`);
-
-    res.send(`       
-        <li id="goal-${courseGoals.length - 1}">
-            <span>${goalText}</span>
-            <button>Remove</button>
-        </li>
-    `);
-
-    // List all items (need to use hx-swap="outerHTML")
-    /*
-    res.send(`
-        <ul id="goals">
-        ${courseGoals.map(
-        (goal, index) => `
-        <li id="goal-${index}">
-            <span>${goal}</span>
-            <button>Remove</button>
-        </li>
-        `
-        )}
-        </ul>
-    `);
-    */
+  const index = courseGoals.length - 1;
+  res.send(`
+    <li id="goal-${index}">
+      <span>${goalText}</span>
+      <button 
+        hx-delete="/goals/${index}"
+        hx-target="#goal-${index}"
+        hx-swap="outerHTML"
+      >
+      Remove
+      </button>
+    </li>
+  `);
 });
+
+app.delete('/goals/:idx', (req, res) => {
+    const index = req.params.idx;
+    courseGoals.splice(index, 1);
+    res.send();
+})
 
 app.listen(3000);
