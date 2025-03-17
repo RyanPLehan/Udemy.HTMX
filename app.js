@@ -37,12 +37,12 @@ app.get('/', (req, res) => {
         <section>
           <ul id="goals">
           ${courseGoals.map(
-            (goal, index) => `
-            <li id="goal-${index}">
-              <span>${goal}</span>
+            (goal) => `
+            <li id="goal-${goal.id}">
+              <span>${goal.text}</span>
               <button 
-                hx-delete="/goals/${index}"
-                hx-target="#goal-${index}"
+                hx-delete="/goals/${goal.id}"
+                hx-target="#goal-${goal.id}"
                 hx-swap="outerHTML"
                 >
                 Remove
@@ -60,16 +60,17 @@ app.get('/', (req, res) => {
 
 app.post('/goals', (req, res) => {
   const goalText = req.body.goal;
-  courseGoals.push(goalText);
-  // res.redirect('/');
+  
+  // Create unique ID instead of using arrary index 
+  const uuid = crypto.randomUUID().toString();
+  courseGoals.push({text: goalText, id: uuid});
 
-  const index = courseGoals.length - 1;
   res.send(`
-    <li id="goal-${index}">
+    <li id="goal-${uuid}">
       <span>${goalText}</span>
       <button 
-        hx-delete="/goals/${index}"
-        hx-target="#goal-${index}"
+        hx-delete="/goals/${uuid}"
+        hx-target="#goal-${uuid}"
         hx-swap="outerHTML"
       >
       Remove
@@ -78,8 +79,10 @@ app.post('/goals', (req, res) => {
   `);
 });
 
-app.delete('/goals/:idx', (req, res) => {
-    const index = req.params.idx;
+app.delete('/goals/:id', (req, res) => {
+    const uuid = req.params.id;
+    // This causes an issue if items are deleted out of order
+    const index = courseGoals.findIndex(goal => goal.id == uuid);
     courseGoals.splice(index, 1);
     res.send();
 })
