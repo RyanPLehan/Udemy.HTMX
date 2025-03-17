@@ -2,6 +2,24 @@ import express from 'express';
 
 const courseGoals = [];
 
+// Use this function to remove goal list item duplication code
+function renderGoalListItem(id, text)
+{
+    return `
+        <li id="goal-${id}">
+            <span>${text}</span>
+            <button 
+            hx-delete="/goals/${id}"
+            hx-target="#goal-${id}"                
+            >
+            Remove
+            </button>
+        </li>
+    `
+}
+
+
+
 const app = express();
 
 app.use(express.urlencoded({ extended: false }));
@@ -37,17 +55,7 @@ app.get('/', (req, res) => {
         <section>
           <ul id="goals" hx-swap="outerHTML">
           ${courseGoals.map(
-            (goal) => `
-            <li id="goal-${goal.id}">
-              <span>${goal.text}</span>
-              <button 
-                hx-delete="/goals/${goal.id}"
-                hx-target="#goal-${goal.id}"                
-                >
-                Remove
-                </button>
-            </li>
-          `
+            (goal) => renderGoalListItem(goal.id, goal.text)
           ).join('')}
           </ul>
         </section>
@@ -63,18 +71,7 @@ app.post('/goals', (req, res) => {
   // Create unique ID instead of using arrary index 
   const uuid = crypto.randomUUID().toString();
   courseGoals.push({text: goalText, id: uuid});
-
-  res.send(`
-    <li id="goal-${uuid}">
-      <span>${goalText}</span>
-      <button 
-        hx-delete="/goals/${uuid}"
-        hx-target="#goal-${uuid}"
-      >
-      Remove
-      </button>
-    </li>
-  `);
+  res.send(renderGoalListItem(uuid, goalText));
 });
 
 app.delete('/goals/:id', (req, res) => {
