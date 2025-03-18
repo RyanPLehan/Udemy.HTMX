@@ -73,7 +73,11 @@ app.post('/goals', (req, res) => {
   // Create unique ID instead of using arrary index 
   const uuid = crypto.randomUUID().toString();
   courseGoals.push({text: goalText, id: uuid});
-  res.send(renderGoalListItem(uuid, goalText));
+
+  // This time delay is to show that the handling the htmx:after-request event is after the arrival of the response of the post
+  setTimeout(() => {
+    res.send(renderGoalListItem(uuid, goalText));
+  }, 2000);
 });
 
 app.delete('/goals/:id', (req, res) => {
