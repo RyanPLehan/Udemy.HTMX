@@ -44,12 +44,13 @@ app.get('/', (req, res) => {
             hx-post="/goals" 
             hx-target="#goals"
             hx-swap="beforeend"
-            hx-on:htmx:after-request="this.reset()">
+            hx-on:htmx:after-request="this.reset()"
+            hx-disabled-elt="#addGoalBtn">
             <div>
               <label htmlFor="goal">Goal</label>
               <input type="text" id="goal" name="goal" />
             </div>
-            <button type="submit">Add goal</button>
+            <button id="addGoalBtn" type="submit">Add goal</button>
           </form>
         </section>
         <section>
