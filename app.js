@@ -1,92 +1,44 @@
 import express from 'express';
 
-const courseGoals = [];
-
-// Use this function to remove goal list item duplication code
-function renderGoalListItem(id, text)
-{
-    return `
-        <li id="goal-${id}">
-            <span>${text}</span>
-            <button 
-            hx-delete="/goals/${id}"
-            hx-target="#goal-${id}"
-            >
-            Remove
-            </button>
-        </li>
-    `
-}
-
+import { AVAILABLE_LOCATIONS } from './data/available-locations.js';
+import renderLocationsPage from './views/index.js';
+import renderLocation from './views/components/location.js';
 
 const app = express();
 
-app.use(express.urlencoded({ extended: false }));
+const INTERESTING_LOCATIONS = [];
+
 app.use(express.static('public'));
+app.use(express.urlencoded({ extended: false }));
 
 app.get('/', (req, res) => {
+  const availableLocations = AVAILABLE_LOCATIONS.filter(
+    (location) => !INTERESTING_LOCATIONS.includes(location)
+  );
+  res.send(renderLocationsPage(availableLocations, INTERESTING_LOCATIONS));
+});
+
+app.post('/places', (req, res) => {
+  const locationId = req.body.locationId;
+  const location = AVAILABLE_LOCATIONS.find((loc) => loc.id === locationId);
+  INTERESTING_LOCATIONS.push(location);
+
+  res.send(renderLocation(location));
+  /*
   res.send(`
-  <!DOCTYPE html>
-  <html lang="en">
-    <head>
-      <meta charSet="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Learn HTMX</title>
-      <link rel="stylesheet" href="/main.css" />
-      <script src="/htmx.2.0.4.min.js" defer></script>
-    </head>
-    <body>
-      <main>
-        <h1>Manage your course goals</h1>
-        <section>
-          <form 
-            id="goal-form" 
-            hx-post="/goals" 
-            hx-target="#goals"
-            hx-swap="beforeend"
-            hx-on:htmx:after-request="this.reset()"
-            hx-disabled-elt="#addGoalBtn">
-            <div>
-              <label htmlFor="goal">Goal</label>
-              <input type="text" id="goal" name="goal" />
-            </div>
-            <button id="addGoalBtn" type="submit">Add goal</button>
-          </form>
-        </section>
-        <section>
-          <ul id="goals" 
-              hx-swap="outerHTML"
-              hx-confirm="Are you sure?">
-          ${courseGoals.map(
-            (goal) => renderGoalListItem(goal.id, goal.text)
-          ).join('')}
-          </ul>
-        </section>
-      </main>
-    </body>
-  </html>
+    TODO
   `);
+  */
 });
 
-app.post('/goals', (req, res) => {
-  const goalText = req.body.goal;
-  
-  // Create unique ID instead of using arrary index 
-  const uuid = crypto.randomUUID().toString();
-  courseGoals.push({text: goalText, id: uuid});
+app.delete('/places/:id', (req, res) => {
+  const locationId = req.params.id;
+  const locationIndex = INTERESTING_LOCATIONS.findIndex(
+    (loc) => loc.id === locationId
+  );
+  INTERESTING_LOCATIONS.splice(locationIndex, 1);
 
-  // This time delay is to show that the handling the htmx:after-request event is after the arrival of the response of the post
-  setTimeout(() => {
-    res.send(renderGoalListItem(uuid, goalText));
-  }, 2000);
+  res.send();
 });
-
-app.delete('/goals/:id', (req, res) => {
-    const uuid = req.params.id;
-    // This causes an issue if items are deleted out of order
-    const index = courseGoals.findIndex(goal => goal.id == uuid);
-    courseGoals.splice(index, 1);
-    res.send();
-})
 
 app.listen(3000);
