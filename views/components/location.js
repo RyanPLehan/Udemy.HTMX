@@ -8,6 +8,7 @@ export default function renderLocation(location, isAvailableLocation = true) {
       hx-target="#interesting-locations"
       hx-swap="beforeend show:#int-locations-section:top"
       hx-on:htmx:before-request"
+      data-action="add"
     `;
   } 
   else {
@@ -16,6 +17,7 @@ export default function renderLocation(location, isAvailableLocation = true) {
       hx-target="#location-${location.id}"
       hx-swap="outerHTML"
       hx-on:htmx:before-request"
+      data-action="remove"
     `;
   }
 
