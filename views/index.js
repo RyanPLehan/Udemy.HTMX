@@ -9,6 +9,7 @@ export default function renderLocationsPage(availableLocations, interestingLocat
         <link rel="stylesheet" href="/main.css" />
         <link rel="icon" href="/logo.png" />
         <script src="/htmx.2.0.4.min.js" defer></script>
+        <script src="/main.js" defer></script>
       </head>
       <body>
         <header>

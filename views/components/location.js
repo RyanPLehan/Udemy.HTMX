@@ -3,18 +3,19 @@ export default function renderLocation(location, isAvailableLocation = true) {
 
   if (isAvailableLocation) {
     attributes = `
-        hx-post="/places" 
-        hx-vals='{"locationId": "${location.id}"}'
-        hx-target="#interesting-locations"
-        hx-swap="beforeend show:#int-locations-section:top"
+      hx-post="/places" 
+      hx-vals='{"locationId": "${location.id}"}'
+      hx-target="#interesting-locations"
+      hx-swap="beforeend show:#int-locations-section:top"
+      hx-on:htmx:before-request"
     `;
   } 
   else {
     attributes = `
       hx-delete="/places/${location.id}"
-      hx-confirm="Are you sure?"
       hx-target="#location-${location.id}"
       hx-swap="outerHTML"
+      hx-on:htmx:before-request"
     `;
   }
 
