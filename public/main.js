@@ -1,4 +1,8 @@
 function showConfirmationModal(event) {
+    if (event.detail.path ==='/suggested-locations') {
+        return;
+    }
+
     event.preventDefault();
     console.log(event);
     const action = event.detail.elt.dataset.action;         // references value from the data-action attribute in the location.js
